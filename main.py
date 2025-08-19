@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv("AMAZON_SECRET_KEY")
 PARTNER_TAG = os.getenv("AMAZON_PARTNER_TAG")
 
 # 📦 Criar cliente Amazon (Brasil)
-amazon = AmazonApi(ACCESS_KEY, SECRET_KEY, PARTNER_TAG, "BR")
+amazon = AmazonApi(ACCESS_KEY, SECRET_KEY, PARTNER_TAG, "BR", throttling=1.5)
 
 # 🚀 Iniciar app FastAPI
 app = FastAPI()
