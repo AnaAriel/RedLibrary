@@ -1,8 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from amazon_paapi import AmazonApi
 from dotenv import load_dotenv
+from sqlalchemy.orm import Session
+from . import models, database, crud
 import os
 
+models.Base.metadata.create_all(bind=database.engine)
 # 🔑 Carregar variáveis do arquivo .env
 load_dotenv()
 
@@ -19,6 +22,14 @@ app = FastAPI()
 # ----------------------------
 # Rotas
 # ----------------------------
+
+# Dependência para pegar a sessão do banco
+def get_db():
+    db = database.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.get("/")
 def home():
