@@ -21,3 +21,8 @@ uvicorn
 python-dotenv
 amazon-paapi
 sqlalchemy
+
+--------------------------------
+pip install fastapi uvicorn[standard] python-dotenv sqlalchemy psycopg2-binary python-amazon-paapi
+
+pip install -python-amazon-paapi
