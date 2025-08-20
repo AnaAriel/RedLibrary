@@ -4,10 +4,10 @@ from . import models
 def create_book(db: Session, book_data: dict):
     db_book = models.Book(
         title=book_data["title"],
-        author=book_data.get("author", ""),
-        description=book_data.get("description", ""),
+        author=book_data.get("author", "Desconhecido"),
+        description=book_data.get("description", "Descrição não disponível"),
         url=book_data.get("url", ""),
-        image=book_data.get("image", "")
+        image=book_data.get("cover_url", "")  # <- campo retornado pela função get_book_data
     )
     db.add(db_book)
     db.commit()

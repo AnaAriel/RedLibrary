@@ -5,8 +5,8 @@ class Book(Base):
     __tablename__ = "books"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    author = Column(String)
-    description = Column(String)
+    title = Column(String, index=True, nullable=False)
+    author = Column(String, default="Desconhecido")
+    description = Column(String, default="Descrição não disponível")
     url = Column(String)
     image = Column(String)
