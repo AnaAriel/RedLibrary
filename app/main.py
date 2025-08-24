@@ -1,35 +1,31 @@
 from fastapi import FastAPI, Depends, HTTPException
-from amazon_paapi import AmazonApi
 from dotenv import load_dotenv
-from pathlib import Path  # <--- GARANTA QUE ESTA LINHA ESTEJA AQUI
+from pathlib import Path
 from sqlalchemy.orm import Session
 from typing import List
-from . import models, database, crud  # <-- certifique-se que models/database/crud estão corretamente configurados
+from . import models, database, crud
 import os
+import requests
 
-# 🔑 Carregar variáveis do .env
+#Carregar variáveis do .env
 env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
-ACCESS_KEY = os.getenv("AMAZON_ACCESS_KEY")
-SECRET_KEY = os.getenv("AMAZON_SECRET_KEY")
-PARTNER_TAG = os.getenv("AMAZON_PARTNER_TAG")
+GOOGLE_BOOKS_API_KEY = os.getenv("GOOGLE_BOOKS_API_KEY")
 
 print("--- CHECANDO VARIÁVEIS DE AMBIENTE ---")
-print(f"ACCESS_KEY: {ACCESS_KEY}")
-print(f"SECRET_KEY: {SECRET_KEY}")
-print(f"PARTNER_TAG: {PARTNER_TAG}")
+print(f"GOOGLE_BOOKS_API_KEY: {GOOGLE_BOOKS_API_KEY}")
 print("--------------------------------------")
 
-# 📦 Criar cliente Amazon (Brasil)
-amazon = AmazonApi(ACCESS_KEY, SECRET_KEY, PARTNER_TAG, "BR", throttling=1.5)
+#Configurações Google Books
+BASE_URL = "https://www.googleapis.com/books/v1/volumes"
 
 # 🚀 Iniciar app FastAPI
 app = FastAPI()
 
-# 💾 Criar tabelas no banco
+#Criar tabelas no banco
 models.Base.metadata.create_all(bind=database.engine)
 
-# 🔁 Dependência de sessão com o banco
+#Dependência de sessão com o banco
 def get_db():
     db = database.SessionLocal()
     try:
@@ -38,28 +34,41 @@ def get_db():
         db.close()
 
 # ----------------------------
-# FUNÇÃO auxiliar para buscar dados na Amazon
+# FUNÇÃO auxiliar para buscar dados no Google Books
 # ----------------------------
 def get_book_data(title: str):
     try:
-        results = amazon.search_items(
-            keywords=title,
-            search_index="Books",
-            item_count=1
-        )
-        if not results:
+        params = {
+            "q": title,
+            "key": GOOGLE_BOOKS_API_KEY,
+            "maxResults": 1
+        }
+        response = requests.get(BASE_URL, params=params)
+        data = response.json()
+
+        if "items" not in data:
             return None
 
-        book = results[0]
+        book = data["items"][0]
+        vi = book.get("volumeInfo", {})
+        ai = book.get("accessInfo", {})
+
         return {
-            "title": book.title,
-            "author": ", ".join(book.authors) if book.authors else "Desconhecido",
-            "description": book.description if hasattr(book, "description") else "Descrição não disponível",
-            "cover_url": book.images.large if book.images else None
+            "title": vi.get("title", "Título não encontrado"),
+            "authors": vi.get("authors", ["Desconhecido"]),
+            "publisher": vi.get("publisher"),
+            "publishedDate": vi.get("publishedDate"),
+            "description": vi.get("description", "Descrição não disponível"),
+            "categories": vi.get("categories"),
+            "pageCount": vi.get("pageCount"),
+            "thumbnail": (vi.get("imageLinks") or {}).get("thumbnail"),
+            "infoLink": vi.get("infoLink"),
+            "previewLink": vi.get("previewLink"),
+            "webReaderLink": ai.get("webReaderLink")
         }
 
     except Exception as e:
-        print("Erro ao buscar na Amazon:", e)
+        print("Erro ao buscar no Google Books:", e)
         return None
 
 # ----------------------------
@@ -68,22 +77,33 @@ def get_book_data(title: str):
 
 @app.get("/")
 def home():
-    return {"message": "API de Livros com Amazon PAAPI 5.0"}
+    return {"message": "API de Livros com Google Books"}
 
-@app.get("/book/{asin}")
-def get_book(asin: str):
+@app.get("/book/{book_id}")
+def get_book(book_id: str):
     try:
-        products = amazon.get_items([asin])
-        if not products:
+        response = requests.get(f"{BASE_URL}/{book_id}", params={"key": GOOGLE_BOOKS_API_KEY})
+        data = response.json()
+
+        if "volumeInfo" not in data:
             return {"error": "Livro não encontrado"}
 
-        book = products[0]
+        vi = data.get("volumeInfo", {})
+        ai = data.get("accessInfo", {})
+
         return {
-            "title": book.title,
-            "author": book.authors,
-            "description": book.description if hasattr(book, "description") else "Descrição não disponível",
-            "url": book.url,
-            "image": book.images.large if book.images else None
+            "title": vi.get("title", "Título não encontrado"),
+            "authors": vi.get("authors", []),
+            "publisher": vi.get("publisher"),
+            "publishedDate": vi.get("publishedDate"),
+            "description": vi.get("description", "Descrição não disponível"),
+            "categories": vi.get("categories"),
+            "pageCount": vi.get("pageCount"),
+            "thumbnail": (vi.get("imageLinks") or {}).get("thumbnail"),
+            "infoLink": vi.get("infoLink"),
+            "previewLink": vi.get("previewLink"),
+            "webReaderLink": ai.get("webReaderLink"),
+            "url": data.get("selfLink")
         }
     except Exception as e:
         return {"error": str(e)}
@@ -91,20 +111,33 @@ def get_book(asin: str):
 @app.get("/search")
 def search_books(keyword: str, count: int = 10):
     try:
-        products = amazon.search_items(
-            keywords=keyword,
-            search_index="Books",
-            item_count=count
-        )
+        params = {
+            "q": keyword,
+            "key": GOOGLE_BOOKS_API_KEY,
+            "maxResults": count
+        }
+        response = requests.get(BASE_URL, params=params)
+        data = response.json()
+
+        if "items" not in data:
+            return []
+
         return [
             {
-                "title": p.title,
-                "author": p.authors,
-                "description": p.description if hasattr(p, "description") else "Descrição não disponível",
-                "url": p.url,
-                "image": p.images.large if p.images else None
+                "title": item.get("volumeInfo", {}).get("title", "Título não encontrado"),
+                "authors": item.get("volumeInfo", {}).get("authors", []),
+                "publisher": item.get("volumeInfo", {}).get("publisher"),
+                "publishedDate": item.get("volumeInfo", {}).get("publishedDate"),
+                "description": item.get("volumeInfo", {}).get("description", "Descrição não disponível"),
+                "categories": item.get("volumeInfo", {}).get("categories"),
+                "pageCount": item.get("volumeInfo", {}).get("pageCount"),
+                "thumbnail": (item.get("volumeInfo", {}).get("imageLinks") or {}).get("thumbnail"),
+                "infoLink": item.get("volumeInfo", {}).get("infoLink"),
+                "previewLink": item.get("volumeInfo", {}).get("previewLink"),
+                "webReaderLink": item.get("accessInfo", {}).get("webReaderLink"),
+                "url": item.get("selfLink")
             }
-            for p in products
+            for item in data["items"]
         ]
     except Exception as e:
         return {"error": str(e)}
@@ -113,7 +146,7 @@ def search_books(keyword: str, count: int = 10):
 def add_book(title: str, db: Session = Depends(get_db)):
     book_data = get_book_data(title)
     if not book_data:
-        raise HTTPException(status_code=404, detail="Livro não encontrado na Amazon")
+        raise HTTPException(status_code=404, detail="Livro não encontrado no Google Books")
     return crud.create_book(db, book_data)
 
 @app.get("/books/")
