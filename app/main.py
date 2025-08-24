@@ -19,7 +19,7 @@ print("--------------------------------------")
 #Configurações Google Books
 BASE_URL = "https://www.googleapis.com/books/v1/volumes"
 
-# 🚀 Iniciar app FastAPI
+#Iniciar app FastAPI
 app = FastAPI()
 
 #Criar tabelas no banco
@@ -33,9 +33,9 @@ def get_db():
     finally:
         db.close()
 
-# ----------------------------
-# FUNÇÃO auxiliar para buscar dados no Google Books
-# ----------------------------
+#----------------------------
+#FUNÇÃO auxiliar para buscar dados no Google Books
+#----------------------------
 def get_book_data(title: str):
     try:
         params = {
@@ -71,9 +71,9 @@ def get_book_data(title: str):
         print("Erro ao buscar no Google Books:", e)
         return None
 
-# ----------------------------
-# ROTAS
-# ----------------------------
+#----------------------------
+#ROTAS
+#----------------------------
 
 @app.get("/")
 def home():
