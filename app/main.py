@@ -7,7 +7,7 @@ from . import models, database, crud
 import os
 import requests
 
-#Carregar variáveis do .env
+# Carregar variáveis do .env
 env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 GOOGLE_BOOKS_API_KEY = os.getenv("GOOGLE_BOOKS_API_KEY")
@@ -16,16 +16,16 @@ print("--- CHECANDO VARIÁVEIS DE AMBIENTE ---")
 print(f"GOOGLE_BOOKS_API_KEY: {GOOGLE_BOOKS_API_KEY}")
 print("--------------------------------------")
 
-#Configurações Google Books
+# Configurações Google Books
 BASE_URL = "https://www.googleapis.com/books/v1/volumes"
 
-#Iniciar app FastAPI
+# Iniciar app FastAPI
 app = FastAPI()
 
-#Criar tabelas no banco
+# Criar tabelas no banco
 models.Base.metadata.create_all(bind=database.engine)
 
-#Dependência de sessão com o banco
+# Dependência de sessão com o banco
 def get_db():
     db = database.SessionLocal()
     try:
@@ -33,9 +33,21 @@ def get_db():
     finally:
         db.close()
 
-#----------------------------
-#FUNÇÃO auxiliar para buscar dados no Google Books
-#----------------------------
+# ----------------------------
+# FUNÇÃO auxiliar para buscar dados no Google Books
+# ----------------------------
+def extract_isbn(volume_info: dict):
+    """Extrai ISBN-10 e ISBN-13 de um volumeInfo"""
+    isbn_10, isbn_13 = None, None
+    for ident in volume_info.get("industryIdentifiers", []):
+        if ident.get("type") == "ISBN_10":
+            isbn_10 = ident.get("identifier")
+        elif ident.get("type") == "ISBN_13":
+            isbn_13 = ident.get("identifier")
+    # Se ISBN-13 existir, usa ele; senão usa ISBN-10
+    isbn = isbn_13 if isbn_13 else isbn_10
+    return isbn_10, isbn_13, isbn
+
 def get_book_data(title: str):
     try:
         params = {
@@ -53,6 +65,8 @@ def get_book_data(title: str):
         vi = book.get("volumeInfo", {})
         ai = book.get("accessInfo", {})
 
+        isbn_10, isbn_13, isbn = extract_isbn(vi)
+
         return {
             "title": vi.get("title", "Título não encontrado"),
             "authors": vi.get("authors", ["Desconhecido"]),
@@ -64,16 +78,19 @@ def get_book_data(title: str):
             "thumbnail": (vi.get("imageLinks") or {}).get("thumbnail"),
             "infoLink": vi.get("infoLink"),
             "previewLink": vi.get("previewLink"),
-            "webReaderLink": ai.get("webReaderLink")
+            "webReaderLink": ai.get("webReaderLink"),
+            "isbn": isbn,
+            "isbn_10": isbn_10,
+            "isbn_13": isbn_13
         }
 
     except Exception as e:
         print("Erro ao buscar no Google Books:", e)
         return None
 
-#----------------------------
-#ROTAS
-#----------------------------
+# ----------------------------
+# ROTAS
+# ----------------------------
 
 @app.get("/")
 def home():
@@ -90,6 +107,7 @@ def get_book(book_id: str):
 
         vi = data.get("volumeInfo", {})
         ai = data.get("accessInfo", {})
+        isbn_10, isbn_13, isbn = extract_isbn(vi)
 
         return {
             "title": vi.get("title", "Título não encontrado"),
@@ -103,6 +121,9 @@ def get_book(book_id: str):
             "infoLink": vi.get("infoLink"),
             "previewLink": vi.get("previewLink"),
             "webReaderLink": ai.get("webReaderLink"),
+            "isbn": isbn,
+            "isbn_10": isbn_10,
+            "isbn_13": isbn_13,
             "url": data.get("selfLink")
         }
     except Exception as e:
@@ -122,23 +143,29 @@ def search_books(keyword: str, count: int = 10):
         if "items" not in data:
             return []
 
-        return [
-            {
-                "title": item.get("volumeInfo", {}).get("title", "Título não encontrado"),
-                "authors": item.get("volumeInfo", {}).get("authors", []),
-                "publisher": item.get("volumeInfo", {}).get("publisher"),
-                "publishedDate": item.get("volumeInfo", {}).get("publishedDate"),
-                "description": item.get("volumeInfo", {}).get("description", "Descrição não disponível"),
-                "categories": item.get("volumeInfo", {}).get("categories"),
-                "pageCount": item.get("volumeInfo", {}).get("pageCount"),
-                "thumbnail": (item.get("volumeInfo", {}).get("imageLinks") or {}).get("thumbnail"),
-                "infoLink": item.get("volumeInfo", {}).get("infoLink"),
-                "previewLink": item.get("volumeInfo", {}).get("previewLink"),
-                "webReaderLink": item.get("accessInfo", {}).get("webReaderLink"),
+        results = []
+        for item in data["items"]:
+            vi = item.get("volumeInfo", {})
+            ai = item.get("accessInfo", {})
+            isbn_10, isbn_13, isbn = extract_isbn(vi)
+
+            results.append({
+                "title": vi.get("title", "Título não encontrado"),
+                "authors": vi.get("authors", []),
+                "publisher": vi.get("publisher"),
+                "publishedDate": vi.get("publishedDate"),
+                "description": vi.get("description", "Descrição não disponível"),
+                "categories": vi.get("categories"),
+                "pageCount": vi.get("pageCount"),
+                "thumbnail": (vi.get("imageLinks") or {}).get("thumbnail"),
+                "infoLink": vi.get("infoLink"),
+                "previewLink": vi.get("previewLink"),
+                "webReaderLink": ai.get("webReaderLink"),
+                "isbn": isbn,
                 "url": item.get("selfLink")
-            }
-            for item in data["items"]
-        ]
+            })
+        return results
+
     except Exception as e:
         return {"error": str(e)}
 
