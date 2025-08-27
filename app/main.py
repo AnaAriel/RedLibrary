@@ -1,9 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
 from pathlib import Path
 from sqlalchemy.orm import Session
 from typing import List
 from . import models, database, crud
+from .auth import hash_password, verify_password
+from fastapi.staticfiles import StaticFiles
 import os
 import requests
 
@@ -22,6 +26,11 @@ BASE_URL = "https://www.googleapis.com/books/v1/volumes"
 # Iniciar app FastAPI
 app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Configuração de templates Jinja2
+templates = Jinja2Templates(directory="app/templates")
+
 # Criar tabelas no banco
 models.Base.metadata.create_all(bind=database.engine)
 
@@ -32,6 +41,74 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# -------------------------------
+# ROTA: Página inicial
+# -------------------------------
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request, "mensagem": "Bem-vindo ao RedLibrary!"})
+
+# -------------------------------
+# ROTA: Página de cadastro (GET)
+# -------------------------------
+@app.get("/register", response_class=HTMLResponse)
+def register_form(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
+# -------------------------------
+# ROTA: Cadastro de usuário (POST)
+# -------------------------------
+@app.post("/register")
+def register_user(
+    request: Request,
+    full_name: str = Form(...),   # Captura campo "Nome completo"
+    email: str = Form(...),       # Captura campo "Email"
+    password: str = Form(...),    # Captura campo "Senha"
+    db: Session = Depends(get_db) # Conexão com DB
+):
+    # Verifica se já existe usuário com este email
+    existing_user = crud.get_user_by_email(db, email)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email já cadastrado")
+
+    # Gera hash da senha antes de salvar
+    hashed_pw = hash_password(password)
+
+    # Cria novo usuário
+    crud.create_user(db, full_name, email, hashed_pw)
+
+    # Redireciona para tela de login após cadastro
+    return RedirectResponse(url="/login", status_code=303)
+
+# -------------------------------
+# ROTA: Página de login (GET)
+# -------------------------------
+@app.get("/login", response_class=HTMLResponse)
+def login_form(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+# -------------------------------
+# ROTA: Login de usuário (POST)
+# -------------------------------
+@app.post("/login")
+def login_user(
+    request: Request,
+    email: str = Form(...),       # Captura campo "Email"
+    password: str = Form(...),    # Captura campo "Senha"
+    db: Session = Depends(get_db) # Conexão com DB
+):
+    # Busca usuário no banco
+    user = crud.get_user_by_email(db, email)
+    if not user:
+        raise HTTPException(status_code=400, detail="Email não encontrado")
+
+    # Verifica senha
+    if not verify_password(password, user.password_hash):
+        raise HTTPException(status_code=400, detail="Senha incorreta")
+
+    # Se ok, redireciona para home
+    return templates.TemplateResponse("index.html", {"request": request, "mensagem": f"Bem-vindo, {user.full_name}!"})
 
 # ----------------------------
 # FUNÇÃO auxiliar para buscar dados no Google Books
@@ -130,7 +207,7 @@ def get_book(book_id: str):
         return {"error": str(e)}
 
 @app.get("/search")
-def search_books(keyword: str, count: int = 10):
+def search_books(keyword: str, count: int = 40):
     try:
         params = {
             "q": keyword,
