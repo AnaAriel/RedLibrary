@@ -1,29 +1,14 @@
 # RedLibrary
 
-instalar o python-dotenv (biblioteca que lê senhas e chaves de um arquivo separado (.env) para que você não precise escrevê-las diretamente no código, deixando-o mais seguro.)
-
-pip install python-dotenv
-
-para iniciar a aplicação é preciso utilizar o comando:
-uvicorn main:app --reload
-
---------------------------------
-
 REQUIREMENTS
-fastapi
-uvicorn
-python-dotenv
-sqlalchemy
+pip install fastapi → framework principal da API.
+pip install uvicorn → servidor ASGI para rodar o FastAPI.
+pip install sqlalchemy → ORM para conectar e manipular o banco de dados SQLite.
+pip install requests → usado para consumir a API do Google Books.
+pip install passlib[bcrypt] → para hashear/verificar senhas de usuários.
+pip install python-dotenv → carregar variáveis de ambiente do arquivo .env.
+pip install jinja2 → motor de templates para renderizar páginas HTML.
+pip install python-multipart → pacote que o FastAPI usa para lidar com formulários HTML enviados via POST.
 
---------------------------------
-
-Senha para cadastro de usuário
-pip install passlib[bcrypt]
-
---------------------------------
-
-pip install requests
-
-pip install python-multipart
-
-
+Para iniciar a aplicação é preciso utilizar o comando:
+uvicorn app.main:app --reload
