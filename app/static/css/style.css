@@ -11,6 +11,13 @@
 
 }
 
+.register-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Aileron', Roboto, sans-serif;
+
+}
+
 .form-section {
   flex: 1;
   background: white;
@@ -42,6 +49,11 @@
 }
 
 .login-form {
+  width: 100%;
+  max-width: 350px;
+}
+
+.register-form {
   width: 100%;
   max-width: 350px;
 }
@@ -117,6 +129,23 @@
 
 .register-btn:hover {
   background: #FCA5A5;
+}
+
+.form-section p {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.form-section p a {
+  color: #9f1d1d;
+  font-weight: 500;
+  text-decoration: none;
+  margin-left: 0.3rem;
+}
+
+.form-section p a:hover {
+  text-decoration: underline;
 }
 
 .decoration-section {

@@ -1,24 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Cadastro - RedLibrary</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+  <meta charset="UTF-8">
+  <title>Cadastro - RedLibrary</title>
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <h1>Cadastro de Usuário</h1>
-    <form method="post" action="/register">
-        <label for="full_name">Nome Completo:</label>
-        <input type="text" name="full_name" required><br><br>
+  <div class="register-container">
+    
+    <!-- Lado do formulário -->
+    <div class="form-section">
+      <div class="logo">
+        <img src="/static/images/logo.png" alt="Logo" class="logo-icon">
+        <span class="logo-text">RedLibrary</span>
+      </div>
 
-        <label for="email">Email:</label>
-        <input type="email" name="email" required><br><br>
+      <form class="register-form" method="post" action="/register">
+        <div class="input-group">
+          <input type="text" name="full_name" class="form-input" placeholder=" " required>
+          <label class="form-label">Nome Completo</label>
+        </div>
 
-        <label for="password">Senha:</label>
-        <input type="password" name="password" required><br><br>
+        <div class="input-group">
+          <input type="email" name="email" class="form-input" placeholder=" " required>
+          <label class="form-label">Email</label>
+        </div>
 
-        <button type="submit">Criar Conta</button>
-    </form>
-    <p>Já tem conta? <a href="/login">Faça login</a></p>
+        <div class="input-group">
+          <input type="password" name="password" class="form-input" placeholder=" " required>
+          <label class="form-label">Senha</label>
+        </div>
+
+        <button type="submit" class="register-btn">Criar Conta</button>
+      </form>
+      
+      <p>Já tem conta? <a href="/login">Faça login</a></p>
+    </div>
+
+    <!-- Lado decorativo -->
+    <div class="decoration-section">
+      <img src="/static/images/pattern.png" alt="Decorativo" class="decoration-pattern">
+    </div>
+
+  </div>
 </body>
 </html>
