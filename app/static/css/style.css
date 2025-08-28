@@ -1,0 +1,150 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Aileron', Roboto, sans-serif;
+
+}
+
+.form-section {
+  flex: 1;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  max-width: 560px;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  
+  margin-bottom: 5rem;
+}
+
+.logo-icon {
+  width: 180px;
+  height: auto;
+  margin-right: 0.5rem;
+}
+
+.logo-text {
+  font-size: 2rem;
+  font-weight: 640;
+  color: #9f1d1d;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 350px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 0;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 2px solid #333;
+  background: transparent;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  border-bottom-color: #9f1d1d;
+}
+
+.form-label {
+  position: absolute;
+  left: 0;
+  top: 0.75rem;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus + .form-label,
+.form-input:not(:placeholder-shown) + .form-label {
+  top: -0.5rem;
+  font-size: 0.875rem;
+  color: #9f1d1d;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #9f1d1d;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+  background: #861616;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #FECACA;
+  color: #333;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-btn:hover {
+  background: #FCA5A5;
+}
+
+.decoration-section {
+  flex: 1;
+  background: #9f1d1d;
+  position: relative;
+  overflow: hidden;
+}
+
+.decoration-pattern {
+position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+  
+  .decoration-section {
+    min-height: 200px;
+  }
+  
+  .form-section {
+    max-width: none;
+  }
+}
