@@ -16,10 +16,6 @@ env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 GOOGLE_BOOKS_API_KEY = os.getenv("GOOGLE_BOOKS_API_KEY")
 
-print("--- CHECANDO VARIÁVEIS DE AMBIENTE ---")
-print(f"GOOGLE_BOOKS_API_KEY: {GOOGLE_BOOKS_API_KEY}")
-print("--------------------------------------")
-
 # Configurações Google Books
 BASE_URL = "https://www.googleapis.com/books/v1/volumes"
 
