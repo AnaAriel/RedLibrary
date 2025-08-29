@@ -4,6 +4,389 @@
   box-sizing: border-box;
 }
 
+body {
+  font-family: 'Aileron', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  background-color: #ffffff; /* mesmo vermelho do login */
+  color: white;
+  line-height: 1.5;
+}
+
+/* ================= HEADER / NAVBAR ================= */
+.navbar {
+  background-color: #9f1d1d;
+  padding: 5px 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  text-decoration: none;
+  flex-direction: column;
+}
+
+.brand__logo {
+  width: 100px;
+  height: auto;
+}
+
+.brand__text {
+  color: white;
+  font-size: 20px;
+  font-weight: 640;
+}
+
+/* ================= SEARCH FORM ================= */
+.search {
+  flex: 1;
+  max-width: 600px;
+  margin: 0 40px;
+}
+
+.search__wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search__input {
+  width: 100%;
+  padding: 9px 45px 9px 18px; /* espaço à direita p/ a lupa */
+  border: 2px solid rgb(255, 255, 255);
+  border-radius: 25px;
+  background-color: #9f1d1d;
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+.search__input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.search-button {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button svg {
+  stroke: white;
+  width: 20px;
+  height: 20px;
+}
+
+/* ================= PROFILE MENU ================= */
+.profile {
+  position: relative;
+}
+
+.profile__button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.profile__avatar {
+  width: 40px;
+  border-radius: 50%;
+}
+
+.profile__menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: white;
+  color: #333;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  min-width: 150px;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.profile__menu.open {
+  display: flex;
+}
+
+.profile__link {
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #9f1d1d;
+  font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+.profile__link:hover {
+  background: #f4f4f4;
+}
+
+/* (UI.js deve alternar .active no menu) */
+.profile__menu.active {
+  display: flex;
+}
+
+/* ================= GRID DE LIVROS ================= */
+.container {
+  padding: 40px;
+  max-width: 1480px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px; /* espaço ENTRE os cards */
+}
+
+.section-books {
+  background: #9f1d1d; /* vermelho */
+  padding: 30px;
+  border-radius: 8px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: transparent;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card__thumb {
+  display: block;
+  margin-bottom: 15px;
+}
+
+.card__img {
+  width: 180px;   /* largura fixa */
+  height: 270px;  /* mantém a proporção */
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 0 auto; /* centraliza a capa */
+}
+
+
+.card__title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  line-height: 1.3;
+  color: white;
+}
+
+.card__meta {
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
+}
+
+/* ================= RESPONSIVO ================= */
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .navbar {
+    padding: 15px 20px;
+  }
+
+  .search {
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .container {
+    padding: 20px;
+  }
+
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .search {
+    margin: 0;
+    width: 100%;
+  }
+}
+
+/* Search Results*/
+
+.container-pesquisa{
+  padding: 40px;
+  max-width: 1480px;
+  margin: 0 auto;
+  color: black;
+}
+
+/* ================= RESULTADOS DE PESQUISA ================= */
+
+/* Linha de informação do resultado */
+.result-info {
+  font-size: 16px;
+  color: #9f1d1d;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* Lista de livros (vertical) */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Cada linha */
+.row {
+  display: flex;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #9f1d1d;
+}
+
+.row__thumb {
+  flex-shrink: 0;
+}
+
+.row__img {
+  width: 120px;  /* tamanho da capa */
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* Bloco de textos */
+.row__body {
+  flex: 1;
+  color: #000;
+}
+
+.row__title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.row__meta {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+/* Paginação */
+.pagination {
+  margin-top: 25px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.page {
+  font-size: 15px;
+  color: #9f1d1d;
+  text-decoration: none;
+}
+
+.page--current {
+  font-weight: bold;
+  color: #000;
+}
+
+/* ================= FILTROS DE PESQUISA ================= */
+.search-filters {
+  padding: 30px 100px 10px; 
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.search--filters {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Reaproveita o input já existente */
+.search--filters .search__wrapper {
+  flex: 1;
+  max-width: 500px;
+}
+
+.search--filters .search__input {
+  border: 2px solid #9f1d1d;
+  background: #fff;
+  color: #000;
+}
+
+.search--filters .search__input::placeholder {
+  color: #666;
+}
+
+/* Checkbox estilizado */
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 15px;
+  color: #000;
+}
+
+.filter-option input[type="checkbox"] {
+  accent-color: #9f1d1d; /* pinta a caixinha com vermelho */
+}
+
+/* Botão Buscar */
+.filter-button {
+  background: #9f1d1d;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.filter-button:hover {
+  background: #861616;
+}
+
 .login-container {
   display: flex;
   min-height: 100vh;
