@@ -45,22 +45,57 @@
     </header>
 
     <main class="container">
-  <div class="section-books">
-    <div class="grid">
-      {% for book in featured_books %}
-      <article class="card">
-        <a class="card__thumb" href="{{ book.infoLink or '#' }}" target="_blank" rel="noopener">
-          <img class="card__img" src="{{ book.thumbnail or '/static/images/logo.png' }}" alt="Capa de {{ book.title }}">
-        </a>
-        <div class="card__body">
-          <h3 class="card__title">{{ book.title }}</h3>
-          <p class="card__meta">{{ book.authors|join(', ') }}</p>
+      <div class="section-books">
+        <div class="grid">
+          {% for book in featured_books %}
+          <article class="card"
+            data-cover="{{ book.thumbnail or '/static/images/logo.png' }}"
+            data-title="{{ book.title }}"
+            data-authors="{{ book.authors|join(', ') if book.authors else 'Desconhecido' }}"
+            data-publisher="{{ book.publisher or '—' }}"
+            data-pages="{{ book.pageCount or '—' }}"
+            data-date="{{ book.publishedDate | format_date or '—' }}"
+            data-description="{{ book.description or 'Sem descrição disponível' }}">
+
+            <a class="card__thumb" href="javascript:void(0);">
+              <img class="card__img" src="{{ book.thumbnail or '/static/images/logo.png' }}" alt="Capa de {{ book.title }}">
+            </a>
+            <div class="card__body">
+              <h3 class="card__title">{{ book.title }}</h3>
+              <p class="card__meta">{{ book.authors|join(', ') }}</p>
+            </div>
+          </article>
+          {% endfor %}
         </div>
-      </article>
-      {% endfor %}
+      </div>
+   </main>
+
+       </main>
+  </div>
+
+  <!-- Modal de detalhes do livro -->
+  <div id="book-modal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+
+      <div class="modal-body">
+        <img id="modal-cover" class="modal-cover" src="" alt="Capa do livro">
+        <div class="modal-info">
+          <h2 id="modal-title"></h2>
+          <p><strong>Autor(a):</strong> <span id="modal-author"></span></p>
+          <p><strong>Editora:</strong> <span id="modal-publisher"></span></p>
+          <p><strong>Páginas:</strong> <span id="modal-pages"></span></p>
+          <p><strong>Data de publicação:</strong> <span id="modal-date"></span></p>
+          <p><strong>Sinopse:</strong></p>
+          <p id="modal-description"></p>
+        </div>
+      </div>
     </div>
   </div>
-</main>
+
+</body>
+</html>
+
 
 </body>
 </html>

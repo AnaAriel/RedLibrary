@@ -38,3 +38,52 @@ if (formFilters) {
 
   enforceExclusive(chkAuthor?.checked ? chkAuthor : chkTitle);
 }
+
+// ===== MODAL DE DETALHES =====
+const modal = document.getElementById("book-modal");
+const modalClose = document.querySelector(".modal-close");
+
+if (modal) {
+  // elementos internos
+  const modalCover = document.getElementById("modal-cover");
+  const modalTitle = document.getElementById("modal-title");
+  const modalAuthor = document.getElementById("modal-author");
+  const modalPublisher = document.getElementById("modal-publisher");
+  const modalPages = document.getElementById("modal-pages");
+  const modalDate = document.getElementById("modal-date");
+  const modalDesc = document.getElementById("modal-description");
+
+  function openBookModal(book) {
+    modalCover.src = book.cover;
+    modalTitle.textContent = book.title;
+    modalAuthor.textContent = book.authors;
+    modalPublisher.textContent = book.publisher || "—";
+    modalPages.textContent = book.pageCount || "—";
+    modalDate.textContent = book.publishedDate || "—";
+    modalDesc.textContent = book.description || "Sem descrição disponível";
+    modal.style.display = "flex";
+  }
+
+  modalClose.addEventListener("click", () => modal.style.display = "none");
+  window.addEventListener("click", (e) => {
+    if (e.target === modal) modal.style.display = "none";
+  });
+
+  // adicionar eventos nos livros
+  document.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => {
+      const book = {
+        cover: card.dataset.cover,
+        title: card.dataset.title,
+        authors: card.dataset.authors,
+        publisher: card.dataset.publisher,
+        pageCount: card.dataset.pages,
+        publishedDate: card.dataset.date,
+        description: card.dataset.description
+      };
+      openBookModal(book);
+    });
+  });
+  
+}
+

@@ -66,35 +66,36 @@
 
   <section class="container-pesquisa"> 
     <p class="result-info">
-      {{ total_books }} livros encontrados <!-- Mostra total encontrado -->
-      | Exibindo {{ displayed_books_start }} a {{ displayed_books_end }} <!-- Mostra faixa exibida -->
+      {{ total_books }} livros encontrados 
+      | Exibindo {{ displayed_books_start }} a {{ displayed_books_end }} 
     </p>
 
   
-    <div class="list"> <!-- Lista vertical de livros (estilo do protótipo) -->
-      {% for book in books %} <!-- Loop em cada livro da página -->
-      <article class="row"> <!-- Linha individual da lista -->
-        <a class="row__thumb" href="{{ book.infoLink or '#' }}" target="_blank" rel="noopener"> <!-- Link da capa -->
-          <img class="row__img" src="{{ book.thumbnail or '/static/images/logo.png' }}" alt="Capa de {{ book.title }}"> <!-- Imagem da capa -->
-        </a> <!-- Fim link capa -->
-        <div class="row__body"> <!-- Bloco com os textos -->
-          <h3 class="row__title">{{ book.title }}</h3> <!-- Título -->
-          <p class="row__meta">Autor(a): {{ book.authors | join(', ') }}</p> <!-- Autor(es) -->
-          <p class="row__meta">Editora: {{ book.publisher }}</p> <!-- Editora -->
-          <p class="row__meta">Páginas: {{ book.pageCount }}</p> <!-- Páginas -->
+    
+      <div class="list"> 
+      {% for book in books %} 
+      <article class="row"> 
+        <div class="row__thumb">
+          <img class="row__img" src="{{ book.thumbnail or '/static/images/logo.png' }}" alt="Capa de {{ book.title }}">
+        </div>
+        <div class="row__body">
+          <h3 class="row__title">{{ book.title }}</h3> 
+          <p class="row__meta">Autor(a): {{ book.authors | join(', ') }}</p> 
+          <p class="row__meta">Editora: {{ book.publisher }}</p> 
+          <p class="row__meta">Páginas: {{ book.pageCount }}</p> 
           <p class="row__meta">Data de publicação: {{ book.publishedDate | format_date }}</p>
+          <p class="row__meta">Sinopse: {{ book.description or 'Sem descrição disponível' }}</p>
         </div>
       </article>
       {% endfor %}
     </div>
 
-    <!-- =================== PAGINAÇÃO =================== -->
-    <nav class="pagination"> <!-- Navegação de páginas -->
-      {% for p in range(1, total_pages + 1) %} <!-- Gera links de 1 até total_pages -->
-        {% if p == current_page %} <!-- Se for a página atual -->
-          <span class="page page--current">{{ p }}</span> <!-- Mostra como atual (sem link) -->
-        {% else %} <!-- Senão -->
-          <a class="page" href="/search?keyword={{ keyword }}&search_by={{ search_by }}&page={{ p }}">{{ p }}</a> <!-- Link para a página p -->
+    <nav class="pagination"> 
+      {% for p in range(1, total_pages + 1) %} 
+        {% if p == current_page %}
+          <span class="page page--current">{{ p }}</span> 
+        {% else %} 
+          <a class="page" href="/search?keyword={{ keyword }}&search_by={{ search_by }}&page={{ p }}">{{ p }}</a> 
         {% endif %}
       {% endfor %}
     </nav>

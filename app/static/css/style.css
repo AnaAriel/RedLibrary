@@ -381,6 +381,65 @@ body {
   background: #861616;
 }
 
+
+/* ===== MODAL DETALHES DO LIVRO ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  max-width: 800px;
+  width: 90%;
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px; right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-body {
+  display: flex;
+  gap: 20px;
+}
+
+.modal-cover {
+  height: 300px;   
+  width: auto;          
+  object-fit: contain;  
+  display: block;
+  margin: auto 0;       /* centraliza dentro da coluna */
+  border-radius: 4px;
+}
+
+
+.modal-info {
+  flex: 1;
+  color: #222;
+}
+
+.modal-info h2 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: #9f1d1d;
+}
+
+
+/* ================= LOGIN/REGISTER ================= */
 .login-container {
   display: flex;
   min-height: 100vh;
