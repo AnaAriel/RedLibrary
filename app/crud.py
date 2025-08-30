@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from . import models
 
 # -------------------------------
-# CRUD de Livros (já existente)
+# CRUD de Livros
 # -------------------------------
 def create_book(db: Session, book_data: dict):
     # Cria um novo livro no banco a partir dos dados recebidos

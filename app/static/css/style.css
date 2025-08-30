@@ -160,7 +160,7 @@ body {
 }
 
 .section-books {
-  background: #9f1d1d; /* vermelho */
+  background: #9f1d1d;
   padding: 30px;
   border-radius: 8px;
   margin-bottom: 40px;
@@ -183,11 +183,11 @@ body {
 }
 
 .card__img {
-  width: 180px;   /* largura fixa */
-  height: 270px;  /* mantém a proporção */
+  width: 180px;
+  height: 270px;
   object-fit: cover;
   border-radius: 8px;
-  margin: 0 auto; /* centraliza a capa */
+  margin: 0 auto;
 }
 
 
@@ -246,7 +246,8 @@ body {
   }
 }
 
-/* Search Results*/
+/* ================= RESULTADOS DE PESQUISA ================= */
+
 
 .container-pesquisa{
   padding: 40px;
@@ -254,8 +255,6 @@ body {
   margin: 0 auto;
   color: black;
 }
-
-/* ================= RESULTADOS DE PESQUISA ================= */
 
 /* Linha de informação do resultado */
 .result-info {
@@ -285,13 +284,12 @@ body {
 }
 
 .row__img {
-  width: 120px;  /* tamanho da capa */
+  width: 120px;
   height: auto;
   border-radius: 4px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-/* Bloco de textos */
 .row__body {
   flex: 1;
   color: #000;
@@ -310,7 +308,6 @@ body {
   margin-bottom: 4px;
 }
 
-/* Paginação */
 .pagination {
   margin-top: 25px;
   display: flex;
@@ -342,7 +339,6 @@ body {
   gap: 15px;
 }
 
-/* Reaproveita o input já existente */
 .search--filters .search__wrapper {
   flex: 1;
   max-width: 500px;
@@ -358,7 +354,6 @@ body {
   color: #666;
 }
 
-/* Checkbox estilizado */
 .filter-option {
   display: flex;
   align-items: center;
@@ -368,10 +363,9 @@ body {
 }
 
 .filter-option input[type="checkbox"] {
-  accent-color: #9f1d1d; /* pinta a caixinha com vermelho */
+  accent-color: #9f1d1d; 
 }
 
-/* Botão Buscar */
 .filter-button {
   background: #9f1d1d;
   color: #fff;
