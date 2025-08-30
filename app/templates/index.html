@@ -30,6 +30,15 @@
       </form>
 
      <div class="profile-area">
+      {% if user_id %}
+        <!-- Ícone de estante visível apenas quando o usuário está logado -->
+        <div class="shelf-icon">
+          <a href="/shelf" title="Minha estante">
+            <img class="book_icon" src="/static/images/book_icon.png">
+          </a>
+        </div>
+      {% endif %}
+
       <div class="profile">
         <button id="btn-profile" class="profile__button" type="button" aria-haspopup="true" aria-expanded="false">
           <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -51,16 +60,7 @@
         </nav>
       </div>
 
-      {% if user_id %}
-        <!-- Ícone de estante visível apenas quando o usuário está logado -->
-        <div class="shelf-icon">
-          <a href="/shelf" title="Minha estante">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19h16M4 5h16M8 5v14M16 5v14"/>
-            </svg>
-          </a>
-        </div>
-      {% endif %}
+      
 </div>
 
     </header>

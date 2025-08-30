@@ -4,17 +4,35 @@
   <meta charset="UTF-8">
   <title>Login - RedLibrary</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .toast {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      background: #ef4444; /* vermelho */
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.2);
+      z-index: 9999;
+      font-weight: 600;
+    }
+  </style>
 </head>
 <body>
+
+  {% if error_message %}
+    <div class="toast">{{ error_message }}</div>
+  {% endif %}
+
   <div class="login-container">
-    
     <div class="form-section">
       <div class="logo">
         <img src="/static/images/logo.png" alt="Logo" class="logo-icon">
         <span class="logo-text">RedLibrary</span>
       </div>
 
-      <form class="login-form" method="post" action="/login">
+      <form class="login-form" method="post" action="/login" novalidate>
         <div class="input-group">
           <input type="email" name="email" class="form-input" placeholder=" " required>
           <label class="form-label">Email</label>
@@ -33,7 +51,6 @@
     <div class="decoration-section">
       <img src="/static/images/pattern.png" alt="Decorativo" class="decoration-pattern">
     </div>
-
   </div>
 </body>
 </html>

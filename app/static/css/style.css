@@ -19,7 +19,7 @@ body::-webkit-scrollbar {
 /* ================= HEADER / NAVBAR ================= */
 .navbar {
   background-color: #9f1d1d;
-  padding: 5px 100px;
+  padding: 5px 250px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -45,11 +45,12 @@ body::-webkit-scrollbar {
   font-weight: 640;
 }
 
+
 /* ================= SEARCH FORM ================= */
 .search {
   flex: 1;
   max-width: 600px;
-  margin: 0 40px;
+  margin: 0 150px;
 }
 
 .search__wrapper {
@@ -66,6 +67,10 @@ body::-webkit-scrollbar {
   color: white;
   font-size: 16px;
   outline: none;
+}
+
+.search__input:hover{
+  background-color: #861616;
 }
 
 .search__input::placeholder {
@@ -93,6 +98,21 @@ body::-webkit-scrollbar {
 }
 
 /* ================= PROFILE MENU ================= */
+.profile-area{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.shelf-icon{
+  margin-right: 30px;
+}
+
+.book_icon{
+  width: 40px;
+  height: auto;
+}
+
 .profile {
   position: relative;
 }
