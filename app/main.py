@@ -119,13 +119,14 @@ def featured_from_google():
 
 @app.get("/", response_class=HTMLResponse)                                    
 def home(request: Request):                                                   
-    featured_books = featured_from_google()                                   
+    featured_books = featured_from_google()    
+    user_id = request.session.get("user_id")                               
     return templates.TemplateResponse(                                        
         "index.html",                                                         
         {                                                                
-            "request": request,                                               
-            "featured_books": featured_books,                                 
-            "mensagem": "Bem-vindo ao RedLibrary!",                           
+            "request": request,
+            "featured_books": featured_books,
+            "user_id": user_id  # passa para o HTML                      
         }
     )
 
