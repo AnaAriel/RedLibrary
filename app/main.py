@@ -4,15 +4,16 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates                              
 from fastapi.staticfiles import StaticFiles                                 
 from sqlalchemy.orm import Session                                          
-from pathlib import Path                                                    
+from pathlib import Path      
 from typing import List, Optional                                           
 from dotenv import load_dotenv                                              
 import os                                                                   
-import requests                                                             
-
-
+import requests 
+from starlette.middleware.sessions import SessionMiddleware                                                            
 from . import models, database, crud                                        
-from .auth import hash_password, verify_password                             
+from .auth import hash_password, verify_password 
+from app.utils import hash_password, verify_password
+
 
 
 env_path = Path(__file__).parent.parent / '.env'                             
@@ -46,7 +47,9 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")     
 
-models.Base.metadata.create_all(bind=database.engine)                        
+models.Base.metadata.create_all(bind=database.engine)
+
+app.add_middleware(SessionMiddleware, secret_key="sua_chave_secreta")
 
 def get_db():                                                                
     db = database.SessionLocal()                                             
@@ -119,7 +122,7 @@ def home(request: Request):
     featured_books = featured_from_google()                                   
     return templates.TemplateResponse(                                        
         "index.html",                                                         
-        {                                                                     
+        {                                                                
             "request": request,                                               
             "featured_books": featured_books,                                 
             "mensagem": "Bem-vindo ao RedLibrary!",                           
@@ -130,7 +133,7 @@ def home(request: Request):
 def login_form(request: Request):                                             
     return templates.TemplateResponse("login.html", {"request": request})     
 
-@app.post("/login")                                                           
+@app.post("/login")
 def login_user(                                                             
     request: Request,                                                  
     email: str = Form(...),                                                  
@@ -142,7 +145,13 @@ def login_user(
         raise HTTPException(status_code=400, detail="Email não encontrado")   
     if not verify_password(password, user.password_hash):                     
         raise HTTPException(status_code=400, detail="Senha incorreta")       
-    return RedirectResponse(url="/", status_code=303)                          
+
+    #SALVA O USUÁRIO NA SESSÃO
+    request.session["user_id"] = user.id
+
+    return RedirectResponse(url="/", status_code=303)  
+
+    
 
 @app.get("/register", response_class=HTMLResponse)                            
 def register_form(request: Request):                                          
@@ -161,7 +170,13 @@ def register_user(
         raise HTTPException(status_code=400, detail="Email já cadastrado")   
     hashed_pw = hash_password(password)                                       
     crud.create_user(db, full_name, email, hashed_pw)                         
-    return RedirectResponse(url="/login", status_code=303)                     
+    return RedirectResponse(url="/login", status_code=303) 
+
+@app.get("/logout")
+def logout(request: Request):
+    request.session.clear()  # limpa a sessão
+    return RedirectResponse(url="/", status_code=303)
+
 
 @app.get("/search", response_class=HTMLResponse)                               
 def search_books(                                                              

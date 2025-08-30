@@ -11,6 +11,11 @@ body {
   line-height: 1.5;
 }
 
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;    /* ou width: 0; height: 0; */
+}
+
 /* ================= HEADER / NAVBAR ================= */
 .navbar {
   background-color: #9f1d1d;
@@ -398,6 +403,8 @@ body {
   background: white;
   padding: 20px;
   max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
   width: 90%;
   border-radius: 8px;
   position: relative;
@@ -405,11 +412,22 @@ body {
   flex-direction: column;
 }
 
+#modal-description {
+  max-height: 300px;  
+  overflow-y: auto;   
+  padding-right: 5px;
+}
+
+#modal-description::-webkit-scrollbar {
+  display: none;
+}
+
 .modal-close {
   position: absolute;
   top: 15px; right: 15px;
   font-size: 24px;
   cursor: pointer;
+  color: black;
 }
 
 .modal-body {
@@ -426,7 +444,6 @@ body {
   border-radius: 4px;
 }
 
-
 .modal-info {
   flex: 1;
   color: #222;
@@ -436,6 +453,12 @@ body {
   margin-bottom: 10px;
   font-size: 1.5rem;
   color: #9f1d1d;
+}
+
+.info-block {
+  border: 1px solid #9f1d1d;
+  padding: 12px;
+  margin-bottom: 18px;
 }
 
 

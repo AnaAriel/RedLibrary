@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from . import models
+from app.models import User
 
 # -------------------------------
 # CRUD de Livros
