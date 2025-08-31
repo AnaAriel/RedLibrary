@@ -656,3 +656,86 @@ position: absolute;
     max-width: none;
   }
 }
+
+.toast {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: #fff;;
+  color: #9f1d1d;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,.2);
+  z-index: 9999;
+  font-weight: 600;
+}
+
+.result-info-header{
+  display: grid;
+  grid-template-columns: 2fr auto;
+  align-items: center;
+}
+
+/* ===== Dropdown (Adicionar livro) ===== */
+.row__body_ext{
+  display: grid;
+  grid-template-columns: 2fr auto;
+  align-items: center;
+  gap: 20px;
+}
+
+.row__add{
+  justify-self: end;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.add-button {
+  background: #fff;
+  color: #9f1d1d;
+  border: 1px solid #9f1d1d;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.add-button:hover {
+  background: #f4f4f4;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  min-width: 120px;
+  flex-direction: column;
+}
+
+.dropdown-menu .dropdown-item {
+  padding: 10px;
+  border: none;
+  background: none;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  font-size: 14px;
+  color: #9f1d1d;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background: #f8f8f8;
+}
+
+.dropdown.open .dropdown-menu {
+  display: flex;
+}

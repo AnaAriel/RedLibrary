@@ -59,7 +59,7 @@
           {% endif %}
         </nav>
       </div>
-      
+
 </div>
 
     </header>
@@ -85,12 +85,29 @@
       </form>
    </section>
 
-  <section class="container-pesquisa"> 
-    <p class="result-info">
-      {{ total_books }} livros encontrados 
-      | Exibindo {{ displayed_books_start }} a {{ displayed_books_end }} 
-    </p>
-    
+  <section class="container-pesquisa">
+    <div class="result-info-header">
+      <div>
+        <p class="result-info">
+          {{ total_books }} livros encontrados 
+          | Exibindo {{ displayed_books_start }} a {{ displayed_books_end }} 
+        </p>
+      </div>
+
+      <div>
+        <nav class="pagination"> 
+          {% for p in range(1, total_pages + 1) %}
+          <p class="result-info">|</p>
+            {% if p == current_page %}
+              <span class="page page--current">{{ p }}</span>
+            {% else %} 
+              <a class="page" href="/search?keyword={{ keyword }}&search_by={{ search_by }}&page={{ p }}">{{ p }}</a> 
+            {% endif %}
+          {% endfor %}
+        </nav>
+      </div>
+    </div>
+        
       <div class="list"> 
       {% for book in books %} 
       <article class="row"> 
@@ -98,26 +115,35 @@
           <img class="row__img" src="{{ book.thumbnail or '/static/images/logo.png' }}" alt="Capa de {{ book.title }}">
         </div>
         <div class="row__body">
-          <h3 class="row__title">{{ book.title }}</h3> 
-          <p class="row__meta">Autor(a): {{ book.authors | join(', ') }}</p> 
-          <p class="row__meta">Editora: {{ book.publisher }}</p> 
-          <p class="row__meta">Páginas: {{ book.pageCount }}</p> 
-          <p class="row__meta">Data de publicação: {{ book.publishedDate | format_date }}</p>
+          <div class="row__body_ext">
+            <div>
+              <h3 class="row__title">{{ book.title }}</h3> 
+              <p class="row__meta">Autor(a): {{ book.authors | join(', ') }}</p> 
+              <p class="row__meta">Editora: {{ book.publisher }}</p> 
+              <p class="row__meta">Páginas: {{ book.pageCount }}</p> 
+              <p class="row__meta">Data de publicação: {{ book.publishedDate | format_date }}</p>
+            </div>
+            <div class="row__add">
+              <!-- Botão "Adicionar" com dropdown -->
+              {% if user_id %}
+              <div class="dropdown">
+                <button class="add-button">Adicionar</button>
+                <div class="dropdown-menu">
+                  <button class="dropdown-item" data-status="lido" data-book="{{ book.isbn }}">Lido</button>
+                  <button class="dropdown-item" data-status="lendo" data-book="{{ book.isbn }}">Lendo</button>
+                  <button class="dropdown-item" data-status="quero_ler" data-book="{{ book.isbn }}">Quero Ler</button>
+                </div>
+              </div>
+              {% else %}
+                
+              {% endif %}
+            </div>
+          </div>
           <p class="row__meta">Sinopse: {{ book.description or 'Sem descrição disponível' }}</p>
         </div>
       </article>
       {% endfor %}
     </div>
-
-    <nav class="pagination"> 
-      {% for p in range(1, total_pages + 1) %} 
-        {% if p == current_page %}
-          <span class="page page--current">{{ p }}</span> 
-        {% else %} 
-          <a class="page" href="/search?keyword={{ keyword }}&search_by={{ search_by }}&page={{ p }}">{{ p }}</a> 
-        {% endif %}
-      {% endfor %}
-    </nav>
   </section>
 </body>
 </html>

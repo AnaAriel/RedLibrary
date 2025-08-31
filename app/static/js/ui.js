@@ -87,4 +87,30 @@ if (modal) {
   
 }
 
+// Abre/fecha o dropdown
+document.addEventListener("click", function(e) {
+  const isDropdownButton = e.target.matches(".add-button");
+  const dropdowns = document.querySelectorAll(".dropdown");
 
+  dropdowns.forEach(drop => {
+    if (drop.contains(e.target)) {
+      drop.classList.toggle("open");
+    } else {
+      drop.classList.remove("open");
+    }
+  });
+});
+
+// Captura o clique nas opções
+document.addEventListener("click", function(e) {
+  if (e.target.matches(".dropdown-item")) {
+    const status = e.target.dataset.status;
+    const bookId = e.target.dataset.book;
+
+    // 🚀 Aqui futuramente você manda pro backend via fetch()
+    alert(`Livro ${bookId} marcado como: ${status}`);
+
+    // Fecha o menu depois do clique
+    e.target.closest(".dropdown").classList.remove("open");
+  }
+});
