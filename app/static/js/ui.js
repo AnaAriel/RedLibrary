@@ -1,18 +1,19 @@
-const btnProfile = document.getElementById('btn-profile'); // Botão do perfil pelo ID
-const menuProfile = document.getElementById('menu-profile'); // Menu suspenso do perfil
+// static/js/ui.js
 
-if (btnProfile && menuProfile) { // Verifica se os elementos existem na página
-  btnProfile.addEventListener('click', () => { // Adiciona evento de clique ao botão
-    menuProfile.classList.toggle('open'); // Alterna a classe 'open' para mostrar/ocultar o menu
+const btnProfile = document.getElementById('btn-profile');
+const menuProfile = document.getElementById('menu-profile');
+
+if (btnProfile && menuProfile) {
+  btnProfile.addEventListener('click', () => {
+    menuProfile.classList.toggle('open');
   });
 
-  document.addEventListener('click', (e) => { // Captura cliques no documento
-    const clickedInside = btnProfile.contains(e.target) || menuProfile.contains(e.target); // Verifica se clicou dentro do perfil
-    if (!clickedInside) menuProfile.classList.remove('open'); // Se clicou fora, fecha o menu
+  document.addEventListener('click', (e) => {
+    const clickedInside = btnProfile.contains(e.target) || menuProfile.contains(e.target);
+    if (!clickedInside) menuProfile.classList.remove('open');
   });
 }
 
-// ====== CHECKBOXES EXCLUSIVAS (TÍTULO x AUTOR) ======
 const formFilters = document.querySelector('.search--filters');
 if (formFilters) {
   const chkTitle  = formFilters.querySelector('#chk-title');
@@ -39,12 +40,10 @@ if (formFilters) {
   enforceExclusive(chkAuthor?.checked ? chkAuthor : chkTitle);
 }
 
-// ===== MODAL DE DETALHES =====
+// ===== MODAL DE DETALHES (LÓGICA ATUALIZADA) =====
 const modal = document.getElementById("book-modal");
-const modalClose = document.querySelector(".modal-close");
-
 if (modal) {
-  // elementos internos
+  const modalClose = document.querySelector(".modal-close");
   const modalCover = document.getElementById("modal-cover");
   const modalTitle = document.getElementById("modal-title");
   const modalAuthor = document.getElementById("modal-author");
@@ -52,15 +51,39 @@ if (modal) {
   const modalPages = document.getElementById("modal-pages");
   const modalDate = document.getElementById("modal-date");
   const modalDesc = document.getElementById("modal-description");
+  
+  // Elementos do formulário do modal da estante
+  const updateForm = document.getElementById("update-form");
+  const deleteForm = document.getElementById("delete-form");
+  const statusSelect = document.getElementById("shelf-status");
+  const ratingInput = document.getElementById("rating-value");
 
-  function openBookModal(book) {
-    modalCover.src = book.cover;
-    modalTitle.textContent = book.title;
-    modalAuthor.textContent = book.authors;
-    modalPublisher.textContent = book.publisher || "—";
-    modalPages.textContent = book.pageCount || "—";
-    modalDate.textContent = book.publishedDate || "—";
-    modalDesc.textContent = book.description || "Sem descrição disponível";
+  function openBookModal(card) {
+    // Sempre preenche as informações básicas do livro
+    modalCover.src = card.dataset.cover;
+    modalTitle.textContent = card.dataset.title;
+    modalAuthor.textContent = card.dataset.authors;
+    modalDesc.textContent = card.dataset.description || "Sem descrição disponível";
+    
+    if (modalPublisher) modalPublisher.textContent = card.dataset.publisher || "—";
+    if (modalPages) modalPages.textContent = card.dataset.pages || "—";
+    if (modalDate) modalDate.textContent = card.dataset.date || "—";
+    
+    const userBookId = card.dataset.userBookId;
+    if (userBookId && updateForm && deleteForm) {
+        updateForm.style.display = "block";
+        deleteForm.style.display = "block";
+
+        updateForm.action = `/shelf/update/${userBookId}`;
+        deleteForm.action = `/shelf/delete/${userBookId}`;
+
+        statusSelect.value = card.dataset.status;
+        ratingInput.value = card.dataset.rating || 0;
+    } else if (updateForm && deleteForm) {
+        updateForm.style.display = "none";
+        deleteForm.style.display = "none";
+    }
+
     modal.style.display = "flex";
   }
 
@@ -69,48 +92,27 @@ if (modal) {
     if (e.target === modal) modal.style.display = "none";
   });
 
-  // adicionar eventos nos livros
   document.querySelectorAll(".card").forEach(card => {
     card.addEventListener("click", () => {
-      const book = {
-        cover: card.dataset.cover,
-        title: card.dataset.title,
-        authors: card.dataset.authors,
-        publisher: card.dataset.publisher,
-        pageCount: card.dataset.pages,
-        publishedDate: card.dataset.date,
-        description: card.dataset.description
-      };
-      openBookModal(book);
+        openBookModal(card);
     });
   });
-  
 }
 
-// Abre/fecha o dropdown
+// Abre/fecha o dropdown de "Adicionar"
 document.addEventListener("click", function(e) {
   const isDropdownButton = e.target.matches(".add-button");
-  const dropdowns = document.querySelectorAll(".dropdown");
+  
+  if (!isDropdownButton && e.target.closest('.dropdown') != null) return;
 
-  dropdowns.forEach(drop => {
-    if (drop.contains(e.target)) {
-      drop.classList.toggle("open");
-    } else {
-      drop.classList.remove("open");
-    }
-  });
-});
-
-// Captura o clique nas opções
-document.addEventListener("click", function(e) {
-  if (e.target.matches(".dropdown-item")) {
-    const status = e.target.dataset.status;
-    const bookId = e.target.dataset.book;
-
-    // 🚀 Aqui futuramente você manda pro backend via fetch()
-    alert(`Livro ${bookId} marcado como: ${status}`);
-
-    // Fecha o menu depois do clique
-    e.target.closest(".dropdown").classList.remove("open");
+  let currentDropdown;
+  if(isDropdownButton) {
+      currentDropdown = e.target.closest('.dropdown');
+      currentDropdown.classList.toggle('open');
   }
+
+  document.querySelectorAll(".dropdown.open").forEach(dropdown => {
+      if(dropdown === currentDropdown) return;
+      dropdown.classList.remove('open');
+  });
 });

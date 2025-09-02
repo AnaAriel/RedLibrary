@@ -1,3 +1,5 @@
+# app/main.py
+
 from fastapi import FastAPI, Depends, Request, Form, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -11,9 +13,8 @@ import re
 import requests
 from starlette.middleware.sessions import SessionMiddleware
 from . import models, database, crud
-# use APENAS um import de hash/verify (remove o duplicado)
 from .auth import hash_password, verify_password
-# from app.utils import hash_password, verify_password  # <- REMOVER
+from datetime import datetime
 
 env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
@@ -22,8 +23,6 @@ GOOGLE_BOOKS_API_KEY = os.getenv("GOOGLE_BOOKS_API_KEY")
 BASE_URL = "https://www.googleapis.com/books/v1/volumes"
 
 templates = Jinja2Templates(directory="app/templates")
-
-from datetime import datetime
 
 def format_date(value: str):
     if not value:
@@ -45,10 +44,8 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 models.Base.metadata.create_all(bind=database.engine)
 
-# 🔐 use uma chave forte via env em produção
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "sua_chave_secreta"))
 
-# Regex de email (tld 2-24 letras)
 EMAIL_REGEX = r"^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,24}$"
 
 def get_db():
@@ -91,12 +88,36 @@ def normalize_book(item: dict) -> dict:
         "url": item.get("selfLink", ""),
     }
 
-def google_search(query: str, max_results: int = 40) -> List[dict]:
-    params = {"q": query, "key": GOOGLE_BOOKS_API_KEY, "maxResults": 40}
-    r = requests.get(BASE_URL, params=params)
-    data = r.json()
-    items = data.get("items", [])
-    return [normalize_book(it) for it in items][:max_results]
+def google_search(query: str, max_results: int = 40, start_index: int = 0) -> (List[dict], int):
+    """
+    Busca na API do Google e retorna uma tupla: (lista de livros, total de itens encontrados).
+    """
+    # Garante que max_results não passe de 40
+    if max_results > 40:
+        max_results = 40
+
+    params = {
+        "q": query,
+        "key": GOOGLE_BOOKS_API_KEY,
+        "maxResults": max_results,
+        "startIndex": start_index
+    }
+
+    try:
+        r = requests.get(BASE_URL, params=params)
+        r.raise_for_status()
+        data = r.json()
+        
+        items = data.get("items", [])
+        total_items = data.get("totalItems", 0)
+
+        normalized_books = [normalize_book(it) for it in items]
+        return (normalized_books, total_items)
+
+    except requests.exceptions.RequestException as e:
+        return ([], 0)
+    except Exception as e:
+        return ([], 0)
 
 def featured_from_google():
     termos_fixos = [
@@ -110,15 +131,13 @@ def featured_from_google():
         resultado = google_search(f'intitle:"{termo}"', max_results=1)
         if resultado:
             featured.append(resultado[0])
-    return featured  # remove o código morto abaixo
+    return featured
 
-# ---------- Flash helpers (mensagens 1 vez) ----------
 def set_flash(request: Request, key: str, message: str):
     request.session[key] = message
 
 def pop_flash(request: Request, key: str):
     return request.session.pop(key, None)
-# -----------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
@@ -145,23 +164,16 @@ def login_user(
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    # ✅ 1) valida email antes de qualquer coisa
     if not re.match(EMAIL_REGEX, email or ""):
         set_flash(request, "flash_error", "Formato de email inválido")
         return RedirectResponse(url="/login", status_code=303)
-
-    # ✅ 2) consulta usuário
     user = crud.get_user_by_email(db, email)
     if not user:
         set_flash(request, "flash_error", "Email não cadastrado")
         return RedirectResponse(url="/login", status_code=303)
-
-    # ✅ 3) verifica senha
     if not verify_password(password, user.password_hash):
         set_flash(request, "flash_error", "Senha incorreta")
         return RedirectResponse(url="/login", status_code=303)
-
-    # ✅ 4) sucesso
     request.session["user_id"] = user.id
     return RedirectResponse(url="/", status_code=303)
 
@@ -178,21 +190,15 @@ def register_user(
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    # ✅ valida email ANTES
     if not re.match(EMAIL_REGEX, email or ""):
         set_flash(request, "flash_error", "Formato de email inválido")
         return RedirectResponse(url="/register", status_code=303)
-
     existing_user = crud.get_user_by_email(db, email)
     if existing_user:
         set_flash(request, "flash_error", "Email já cadastrado")
         return RedirectResponse(url="/register", status_code=303)
-
     hashed_pw = hash_password(password)
     crud.create_user(db, full_name, email, hashed_pw)
-
-    # opcional: mensagem de sucesso (se quiser, crie flash_success e leia no login)
-    # set_flash(request, "flash_error", "Conta criada! Faça login.")
     return RedirectResponse(url="/login", status_code=303)
 
 @app.get("/logout")
@@ -208,16 +214,17 @@ def search_books(
     page: int = Query(1, ge=1),
 ):
     query = f'inauthor:"{keyword}"' if search_by == "author" else f'intitle:"{keyword}"'
-    raw_results = google_search(query, max_results=120)
-    total_books = len(raw_results)
+    
+    per_page = 20 # Quantos livros você quer mostrar por página no seu site
+    start_index = (page - 1) * per_page
 
-    per_page = 20
-    start = (page - 1) * per_page
-    end = start + per_page
-    books = raw_results[start:end]
+    # A função agora retorna os livros JÁ PAGINADOS e o total de resultados
+    books, total_books = google_search(query, max_results=per_page, start_index=start_index)
+    total_books = min(total_books, 100)
 
-    displayed_start = 0 if total_books == 0 else start + 1
-    displayed_end = min(end, total_books)
+    # A lógica de paginação agora usa o `total_books` retornado pela API
+    displayed_start = 0 if total_books == 0 else start_index + 1
+    displayed_end = min(start_index + len(books), total_books)
     total_pages = max(1, (total_books + per_page - 1) // per_page)
 
     user_id = request.session.get("user_id")
@@ -238,3 +245,80 @@ def search_books(
             "user_id": user_id,
         }
     )
+
+# =========================================================
+# ============ NOVAS ROTAS PARA A ESTANTE =================
+# =========================================================
+
+@app.post("/shelf/add")
+def add_to_shelf(
+    request: Request,
+    db: Session = Depends(get_db),
+    # Dados do livro vêm do formulário
+    book_title: str = Form(...),
+    book_authors: str = Form(...),
+    book_description: str = Form(...),
+    book_thumbnail: str = Form(...),
+    book_isbn: str = Form(None), # ISBN pode ser nulo
+    status: str = Form(...)
+):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return RedirectResponse("/login", status_code=303)
+
+    book_data = {
+        "title": book_title,
+        "authors": book_authors.split(','),
+        "description": book_description,
+        "thumbnail": book_thumbnail,
+        "isbn": book_isbn
+    }
+
+    book = crud.get_or_create_book(db, book_data)
+    crud.add_book_to_shelf(db, user_id=user_id, book_id=book.id, status=status)
+    return RedirectResponse("/shelf", status_code=303)
+
+@app.get("/shelf", response_class=HTMLResponse)
+def view_shelf(request: Request, db: Session = Depends(get_db)):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return RedirectResponse("/login", status_code=303)
+
+    user_books = crud.get_user_shelf(db, user_id)
+    
+    return templates.TemplateResponse(
+        "shelf.html",
+        {
+            "request": request,
+            "user_id": user_id,
+            "user_books": user_books
+        }
+    )
+
+@app.post("/shelf/update/{user_book_id}")
+def update_shelf(
+    request: Request,
+    user_book_id: int,
+    db: Session = Depends(get_db),
+    status: str = Form(...),
+    rating: int = Form(0)
+):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return RedirectResponse("/login", status_code=303)
+    
+    crud.update_shelf_item(db, user_book_id, status, rating)
+    return RedirectResponse("/shelf", status_code=303)
+
+@app.post("/shelf/delete/{user_book_id}")
+def delete_from_shelf(
+    request: Request,
+    user_book_id: int,
+    db: Session = Depends(get_db)
+):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return RedirectResponse("/login", status_code=303)
+        
+    crud.remove_book_from_shelf(db, user_book_id)
+    return RedirectResponse("/shelf", status_code=303)

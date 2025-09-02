@@ -1,7 +1,7 @@
 <!DOCTYPE html> 
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8"
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resultados da busca - RedLibrary</title>
   <link rel="stylesheet" href="/static/css/style.css">
@@ -15,30 +15,27 @@
       <span class="brand__text">RedLibrary</span>
     </a>
 
-     <form class="search" method="get" action="/search">
-        <div class="search__wrapper">
-        <input class="search__input" type="text" name="keyword" placeholder="Buscar por título" required>
-        <input type="hidden" id="search_by_header" name="search_by" value="title">
-        <button class="search-button" type="submit">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <circle cx="9" cy="9" r="8" stroke="white" stroke-width="2"/>
-          <path d="m21 21-4.35-4.35" stroke="white" stroke-width="2"/>
-        </svg>
-      </button>
-        </div>
-      </form>
+    <form class="search" method="get" action="/search">
+      <div class="search__wrapper">
+      <input class="search__input" type="text" name="keyword" placeholder="Buscar por título" required>
+      <input type="hidden" id="search_by_header" name="search_by" value="title">
+      <button class="search-button" type="submit">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="9" cy="9" r="8" stroke="white" stroke-width="2"/>
+        <path d="m21 21-4.35-4.35" stroke="white" stroke-width="2"/>
+      </svg>
+    </button>
+      </div>
+    </form>
 
     <div class="profile-area">
-
       {% if user_id %}
-        <!-- Ícone de estante visível apenas quando o usuário está logado -->
-        <div class="shelf-icon">
-          <a href="/shelf" title="Minha estante">
-            <img class="book_icon" src="/static/images/book_icon.png">
-          </a>
-        </div>
+      <div class="shelf-icon">
+        <a href="/shelf" title="Minha estante">
+          <img class="book_icon" src="/static/images/book_icon.png">
+        </a>
+      </div>
       {% endif %}
-
       <div class="profile">
         <button id="btn-profile" class="profile__button" type="button" aria-haspopup="true" aria-expanded="false">
           <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -47,43 +44,35 @@
               <path d="M9.33 33.33c0-6.67 4.67-10.67 10.67-10.67s10.67 4 10.67 10.67" stroke="white" stroke-width="2.67"/>
           </svg>
         </button>
-
         <nav id="menu-profile" class="profile__menu">
           {% if user_id %}
-            <!-- Usuário logado -->
             <a class="profile__link" href="/logout">Sair</a>
           {% else %}
-            <!-- Usuário NÃO logado -->
             <a class="profile__link" href="/login">Fazer login</a>
             <a class="profile__link" href="/register">Criar conta</a>
           {% endif %}
         </nav>
       </div>
-
-</div>
-
-    </header>
+    </div>
+  </header>
   
-    <section class="search-filters">
-      <form class="search search--filters" method="get" action="/search">
-        <div class="search__wrapper">
-          <input class="search__input" type="text" name="keyword" placeholder="Buscar por título ou autor" required>
-          <input type="hidden" id="search_by_filters" name="search_by" value="{{ 'author' if search_by=='author' else 'title' }}">
-        </div>
-
-        <label class="filter-option">
-          <input type="checkbox" id="chk-title">
-          <span>Título</span>
-        </label>
-
-        <label class="filter-option">
-          <input type="checkbox" id="chk-author">
-          <span>Autor</span>
-        </label>
-
-        <button type="submit" class="filter-button">Buscar</button>
-      </form>
-   </section>
+  <section class="search-filters">
+    <form class="search search--filters" method="get" action="/search">
+      <div class="search__wrapper">
+        <input class="search__input" type="text" name="keyword" placeholder="Buscar por título ou autor" required>
+        <input type="hidden" id="search_by_filters" name="search_by" value="{{ 'author' if search_by=='author' else 'title' }}">
+      </div>
+      <label class="filter-option">
+        <input type="checkbox" id="chk-title">
+        <span>Título</span>
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" id="chk-author">
+        <span>Autor</span>
+      </label>
+      <button type="submit" class="filter-button">Buscar</button>
+    </form>
+  </section>
 
   <section class="container-pesquisa">
     <div class="result-info-header">
@@ -93,7 +82,6 @@
           | Exibindo {{ displayed_books_start }} a {{ displayed_books_end }} 
         </p>
       </div>
-
       <div>
         <nav class="pagination"> 
           {% for p in range(1, total_pages + 1) %}
@@ -107,42 +95,65 @@
         </nav>
       </div>
     </div>
-        
-      <div class="list"> 
-      {% for book in books %} 
-      <article class="row"> 
-        <div class="row__thumb">
-          <img class="row__img" src="{{ book.thumbnail or '/static/images/logo.png' }}" alt="Capa de {{ book.title }}">
-        </div>
-        <div class="row__body">
-          <div class="row__body_ext">
-            <div>
-              <h3 class="row__title">{{ book.title }}</h3> 
-              <p class="row__meta">Autor(a): {{ book.authors | join(', ') }}</p> 
-              <p class="row__meta">Editora: {{ book.publisher }}</p> 
-              <p class="row__meta">Páginas: {{ book.pageCount }}</p> 
-              <p class="row__meta">Data de publicação: {{ book.publishedDate | format_date }}</p>
-            </div>
-            <div class="row__add">
-              <!-- Botão "Adicionar" com dropdown -->
-              {% if user_id %}
-              <div class="dropdown">
-                <button class="add-button">Adicionar</button>
-                <div class="dropdown-menu">
-                  <button class="dropdown-item" data-status="lido" data-book="{{ book.isbn }}">Lido</button>
-                  <button class="dropdown-item" data-status="lendo" data-book="{{ book.isbn }}">Lendo</button>
-                  <button class="dropdown-item" data-status="quero_ler" data-book="{{ book.isbn }}">Quero Ler</button>
-                </div>
-              </div>
-              {% else %}
-                
-              {% endif %}
-            </div>
+      
+    <div class="list"> 
+    {% for book in books %} 
+    <article class="row"> 
+      <div class="row__thumb">
+        <img class="row__img" src="{{ book.thumbnail or '/static/images/logo.png' }}" alt="Capa de {{ book.title }}">
+      </div>
+      <div class="row__body">
+        <div class="row__body_ext">
+          <div>
+            <h3 class="row__title">{{ book.title }}</h3> 
+            <p class="row__meta">Autor(a): {{ book.authors | join(', ') }}</p> 
+            <p class="row__meta">Editora: {{ book.publisher }}</p> 
+            <p class="row__meta">Páginas: {{ book.pageCount }}</p> 
+            <p class="row__meta">Data de publicação: {{ book.publishedDate | format_date }}</p>
           </div>
-          <p class="row__meta">Sinopse: {{ book.description or 'Sem descrição disponível' }}</p>
+          <div class="row__add">
+            {% if user_id %}
+            <div class="dropdown">
+              <button class="add-button">Adicionar</button>
+              <div class="dropdown-menu">
+                <form action="/shelf/add" method="post">
+                    <input type="hidden" name="book_title" value="{{ book.title }}">
+                    <input type="hidden" name="book_authors" value="{{ book.authors|join(',') }}">
+                    <input type="hidden" name="book_description" value="{{ book.description or '' }}">
+                    <input type="hidden" name="book_thumbnail" value="{{ book.thumbnail or '' }}">
+                    <input type="hidden" name="book_isbn" value="{{ book.isbn or '' }}">
+                    <input type="hidden" name="status" value="lido">
+                    <button type="submit" class="dropdown-item">Lido</button>
+                </form>
+
+                <form action="/shelf/add" method="post">
+                    <input type="hidden" name="book_title" value="{{ book.title }}">
+                    <input type="hidden" name="book_authors" value="{{ book.authors|join(',') }}">
+                    <input type="hidden" name="book_description" value="{{ book.description or '' }}">
+                    <input type="hidden" name="book_thumbnail" value="{{ book.thumbnail or '' }}">
+                    <input type="hidden" name="book_isbn" value="{{ book.isbn or '' }}">
+                    <input type="hidden" name="status" value="lendo">
+                    <button type="submit" class="dropdown-item">Lendo</button>
+                </form>
+
+                <form action="/shelf/add" method="post">
+                    <input type="hidden" name="book_title" value="{{ book.title }}">
+                    <input type="hidden" name="book_authors" value="{{ book.authors|join(',') }}">
+                    <input type="hidden" name="book_description" value="{{ book.description or '' }}">
+                    <input type="hidden" name="book_thumbnail" value="{{ book.thumbnail or '' }}">
+                    <input type="hidden" name="book_isbn" value="{{ book.isbn or '' }}">
+                    <input type="hidden" name="status" value="quero_ler">
+                    <button type="submit" class="dropdown-item">Quero Ler</button>
+                </form>
+              </div>
+            </div>
+            {% endif %}
+          </div>
         </div>
-      </article>
-      {% endfor %}
+        <p class="row__meta">Sinopse: {{ book.description or 'Sem descrição disponível' }}</p>
+      </div>
+    </article>
+    {% endfor %}
     </div>
   </section>
 </body>
