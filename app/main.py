@@ -128,10 +128,16 @@ def featured_from_google():
     ]
     featured = []
     for termo in termos_fixos:
-        resultado = google_search(f'intitle:"{termo}"', max_results=1)
-        if resultado:
-            featured.append(resultado[0])
-    return featured  # remove o código morto abaixo
+        # --- LÓGICA CORRIGIDA ABAIXO ---
+        # Agora, desempacotamos a tupla (lista_de_livros, total)
+        livros_encontrados, total = google_search(f'intitle:"{termo}"', max_results=1)
+        
+        # Verificamos se a LISTA de livros não está vazia
+        if livros_encontrados:
+            # Pegamos o primeiro item da LISTA
+            featured.append(livros_encontrados[0])
+            
+    return featured
 
 # ---------- Flash helpers (mensagens 1 vez) ----------
 def set_flash(request: Request, key: str, message: str):
