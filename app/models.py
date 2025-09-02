@@ -15,6 +15,9 @@ class Book(Base):
     # Campos que faltavam:
     thumbnail = Column(String)
     isbn = Column(String, unique=True, index=True, nullable=True)
+    publisher = Column(String, default="—")
+    pageCount = Column(Integer, nullable=True)
+    publishedDate = Column(String, default="—")
 
     # Relação com UserBook
     users = relationship("UserBook", back_populates="book")

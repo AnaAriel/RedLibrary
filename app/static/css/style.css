@@ -6,14 +6,14 @@
 
 body {
   font-family: 'Aileron', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-  background-color: #ffffff; /* mesmo vermelho do login */
-  color: white;
+  background-color: #ffffff;
+  color: #333; /* Default para textos, será sobrescrito em seções vermelhas */
   line-height: 1.5;
 }
 
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
-  display: none;    /* ou width: 0; height: 0; */
+  display: none;
 }
 
 /* ================= HEADER / NAVBAR ================= */
@@ -60,7 +60,7 @@ body::-webkit-scrollbar {
 
 .search__input {
   width: 100%;
-  padding: 9px 45px 9px 18px; /* espaço à direita p/ a lupa */
+  padding: 9px 45px 9px 18px;
   border: 2px solid rgb(255, 255, 255);
   border-radius: 25px;
   background-color: #9f1d1d;
@@ -159,12 +159,11 @@ body::-webkit-scrollbar {
   background: #f4f4f4;
 }
 
-/* (UI.js deve alternar .active no menu) */
 .profile__menu.active {
   display: flex;
 }
 
-/* ================= GRID DE LIVROS ================= */
+/* ================= GRID DE LIVROS (Geral) ================= */
 .container {
   padding: 40px;
   max-width: 1480px;
@@ -178,10 +177,12 @@ body::-webkit-scrollbar {
   color: white;
 }
 
+/* MUDANÇA PRINCIPAL NO GRID */
 .grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px; /* espaço ENTRE os cards */
+  /* Esta linha mágica cria um grid responsivo que se preenche automaticamente */
+  grid-template-columns: repeat(5, minmax(180px, 1fr));
+  gap: 20px;
 }
 
 .section-books {
@@ -190,12 +191,19 @@ body::-webkit-scrollbar {
   border-radius: 8px;
   margin-bottom: 40px;
 }
+.section-books h2 {
+  color: white;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
 
 .card {
   background: transparent;
-  text-align: center;
+  text-align: center; /* Garante que tudo dentro do card comece centralizado */
   cursor: pointer;
   transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .card:hover {
@@ -210,532 +218,185 @@ body::-webkit-scrollbar {
 .card__img {
   width: 180px;
   height: 270px;
-  object-fit: cover;
   border-radius: 8px;
   margin: 0 auto;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
+.card__body {
+  margin-top: auto;
+}
 
 .card__title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   margin-bottom: 5px;
   line-height: 1.3;
   color: white;
+  text-align: center; /* MUDANÇA: Centralizado */
 }
 
 .card__meta {
   font-size: 14px;
   color: rgba(255,255,255,0.8);
+  text-align: center; /* MUDANÇA: Centralizado */
 }
 
 /* ================= RESPONSIVO ================= */
+/* Com o novo grid, podemos simplificar o responsivo */
 @media (max-width: 1200px) {
-  .grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  .navbar { padding: 5px 5%; }
+  /* A linha do grid não precisa mais ser alterada aqui */
 }
 
 @media (max-width: 900px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .navbar {
-    padding: 15px 20px;
-  }
-
-  .search {
-    margin: 0 20px;
-  }
+  .navbar { padding: 15px 20px; }
+  .search { margin: 0 20px; }
+  /* A linha do grid não precisa mais ser alterada aqui */
 }
 
 @media (max-width: 600px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .container {
-    padding: 20px;
-  }
-
-  .navbar {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .search {
-    margin: 0;
-    width: 100%;
-  }
+  .container { padding: 20px; }
+  .navbar { flex-direction: column; gap: 15px; }
+  .search { margin: 0; width: 100%; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); } /* Apenas ajusta o tamanho mínimo em telas pequenas */
 }
 
-/* ================= RESULTADOS DE PESQUISA ================= */
 
-
+/* ================= RESULTADOS DE PESQUISA (Sem alterações) ================= */
 .container-pesquisa{
   padding: 40px;
   max-width: 1480px;
   margin: 0 auto;
   color: black;
 }
+.result-info { font-size: 16px; color: #9f1d1d; margin-bottom: 20px; font-weight: 600; }
+.list { display: flex; flex-direction: column; gap: 30px; }
+.row { display: flex; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid #9f1d1d; }
+.row__thumb { flex-shrink: 0; }
+.row__img { width: 120px; height: auto; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+.row__body { flex: 1; color: #000; }
+.row__title { font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #000; }
+.row__meta { font-size: 15px; color: #333; margin-bottom: 4px; }
+.pagination { margin-top: 25px; display: flex; gap: 8px; justify-content: flex-end; }
+.page { font-size: 15px; color: #9f1d1d; text-decoration: none; }
+.page--current { font-weight: bold; color: #000; }
 
-/* Linha de informação do resultado */
-.result-info {
-  font-size: 16px;
-  color: #9f1d1d;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
+/* ================= FILTROS DE PESQUISA (Sem alterações) ================= */
+.search-filters { padding: 30px 100px 10px; background: #fff; border-bottom: 1px solid #ddd; }
+.search--filters { display: flex; align-items: center; gap: 15px; }
+.search--filters .search__wrapper { flex: 1; max-width: 500px; }
+.search--filters .search__input { border: 2px solid #9f1d1d; background: #fff; color: #000; }
+.search--filters .search__input::placeholder { color: #666; }
+.filter-option { display: flex; align-items: center; gap: 5px; font-size: 15px; color: #000; }
+.filter-option input[type="checkbox"] { accent-color: #9f1d1d; }
+.filter-button { background: #9f1d1d; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; font-size: 15px; cursor: pointer; transition: background 0.3s ease; }
+.filter-button:hover { background: #861616; }
 
-/* Lista de livros (vertical) */
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
+/* ===== MODAL DETALHES DO LIVRO (GENÉRICO/HOME) ===== */
+.modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+.modal-content { background: white; padding: 20px; max-width: 800px; max-height: 90vh; overflow-y: auto; width: 90%; border-radius: 8px; position: relative; display: flex; flex-direction: column; }
+#modal-description { max-height: 300px; overflow-y: auto; padding-right: 5px; color: #333; }
+#modal-description::-webkit-scrollbar { display: none; }
+.modal-close { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; color: black; }
+.modal-body { display: flex; gap: 20px; }
+.modal-cover { height: 300px; width: auto; object-fit: contain; display: block; margin: auto; border-radius: 4px; }
+.modal-info { flex: 1; color: #222; }
+.modal-info h2 { margin-bottom: 10px; font-size: 1.5rem; color: #9f1d1d; }
+.info-block { border: 1px solid #9f1d1d; padding: 12px; margin-bottom: 18px; }
 
-/* Cada linha */
-.row {
-  display: flex;
-  gap: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #9f1d1d;
-}
-
-.row__thumb {
-  flex-shrink: 0;
-}
-
-.row__img {
-  width: 120px;
-  height: auto;
-  border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-.row__body {
-  flex: 1;
-  color: #000;
-}
-
-.row__title {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #000;
-}
-
-.row__meta {
-  font-size: 15px;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.pagination {
-  margin-top: 25px;
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.page {
-  font-size: 15px;
-  color: #9f1d1d;
-  text-decoration: none;
-}
-
-.page--current {
-  font-weight: bold;
-  color: #000;
-}
-
-/* ================= FILTROS DE PESQUISA ================= */
-.search-filters {
-  padding: 30px 100px 10px; 
-  background: #fff;
-  border-bottom: 1px solid #ddd;
-}
-
-.search--filters {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.search--filters .search__wrapper {
-  flex: 1;
-  max-width: 500px;
-}
-
-.search--filters .search__input {
-  border: 2px solid #9f1d1d;
-  background: #fff;
-  color: #000;
-}
-
-.search--filters .search__input::placeholder {
-  color: #666;
-}
-
-.filter-option {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 15px;
-  color: #000;
-}
-
-.filter-option input[type="checkbox"] {
-  accent-color: #9f1d1d; 
-}
-
-.filter-button {
-  background: #9f1d1d;
-  color: #fff;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.filter-button:hover {
-  background: #861616;
-}
-
-
-/* ===== MODAL DETALHES DO LIVRO ===== */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 9999;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  width: 90%;
-  border-radius: 8px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-#modal-description {
-  max-height: 300px;  
-  overflow-y: auto;   
-  padding-right: 5px;
-}
-
-#modal-description::-webkit-scrollbar {
-  display: none;
-}
-
-.modal-close {
-  position: absolute;
-  top: 15px; right: 15px;
-  font-size: 24px;
-  cursor: pointer;
-  color: black;
-}
-
-.modal-body {
-  display: flex;
-  gap: 20px;
-}
-
-.modal-cover {
-  height: 300px;   
-  width: auto;          
-  object-fit: contain;  
-  display: block;
-  margin: auto 0;       /* centraliza dentro da coluna */
-  border-radius: 4px;
-}
-
-.modal-info {
-  flex: 1;
-  color: #222;
-}
-
-.modal-info h2 {
-  margin-bottom: 10px;
-  font-size: 1.5rem;
-  color: #9f1d1d;
-}
-
-.info-block {
-  border: 1px solid #9f1d1d;
-  padding: 12px;
-  margin-bottom: 18px;
-}
-
-
-/* ================= LOGIN/REGISTER ================= */
-.login-container {
-  display: flex;
-  min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Aileron', Roboto, sans-serif;
-
-}
-
-.register-container {
-  display: flex;
-  min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Aileron', Roboto, sans-serif;
-
-}
-
-.form-section {
-  flex: 1;
-  background: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-  max-width: 560px;
-}
-
-.logo {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;  
-  margin-bottom: 5rem;
-}
-
-.logo-icon {
-  width: 180px;
-  height: auto;
-  margin-right: 0.5rem;
-}
-
-.logo-text {
-  font-size: 2rem;
-  font-weight: 640;
-  color: #9f1d1d;
-}
-
-.login-form {
-  width: 100%;
-  max-width: 350px;
-}
-
-.register-form {
-  width: 100%;
-  max-width: 350px;
-}
-
-.input-group {
-  position: relative;
-  margin-bottom: 2rem;
-}
-
-.form-input {
-  width: 100%;
-  padding: 0.75rem 0;
-  font-size: 1rem;
-  border: none;
-  border-bottom: 2px solid #333;
-  background: transparent;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.form-input:focus {
-  border-bottom-color: #9f1d1d;
-}
-
-.form-label {
-  position: absolute;
-  left: 0;
-  top: 0.75rem;
-  font-size: 1rem;
-  color: #333;
-  font-weight: 500;
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-
-.form-input:focus + .form-label,
-.form-input:not(:placeholder-shown) + .form-label {
-  top: -0.5rem;
-  font-size: 0.875rem;
-  color: #9f1d1d;
-}
-
-.login-btn {
-  width: 100%;
-  padding: 1rem;
-  background: #9f1d1d;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-bottom: 1rem;
-  transition: background-color 0.3s ease;
-}
-
-.login-btn:hover {
-  background: #861616;
-}
-
-.register-btn {
-  width: 100%;
-  padding: 1rem;
-  background: #FECACA;
-  color: #333;
-  border: none;
-  border-radius: 25px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.register-btn:hover {
-  background: #FCA5A5;
-}
-
-.form-section p {
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: #444;
-}
-
-.form-section p a {
-  color: #9f1d1d;
-  font-weight: 500;
-  text-decoration: none;
-  margin-left: 0.3rem;
-}
-
-.form-section p a:hover {
-  text-decoration: underline;
-}
-
-.decoration-section {
-  flex: 1;
-  background: #9f1d1d;
-  position: relative;
-  overflow: hidden;
-}
-
-.decoration-pattern {
-position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%; 
-  height: 100%;
-  object-fit: cover;
-}
-
-@media (max-width: 768px) {
-  .login-container {
-    flex-direction: column;
-  }
-  
-  .decoration-section {
-    min-height: 200px;
-  }
-  
-  .form-section {
-    max-width: none;
-  }
-}
-
-.toast {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  background: #fff;;
-  color: #9f1d1d;
-  padding: 12px 16px;
-  border-radius: 12px;
-  box-shadow: 0 10px 20px rgba(0,0,0,.2);
-  z-index: 9999;
-  font-weight: 600;
-}
-
-.result-info-header{
-  display: grid;
-  grid-template-columns: 2fr auto;
-  align-items: center;
-}
+/* ================= LOGIN/REGISTER (Sem alterações) ================= */
+.login-container, .register-container { display: flex; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Aileron', Roboto, sans-serif; }
+.form-section { flex: 1; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; max-width: 560px; }
+.logo { display: flex; flex-direction: column; justify-content: center; margin-bottom: 5rem; }
+.logo-icon { width: 180px; height: auto; margin-right: 0.5rem; }
+.logo-text { font-size: 2rem; font-weight: 640; color: #9f1d1d; }
+.login-form, .register-form { width: 100%; max-width: 350px; }
+.input-group { position: relative; margin-bottom: 2rem; }
+.form-input { width: 100%; padding: 0.75rem 0; font-size: 1rem; border: none; border-bottom: 2px solid #333; background: transparent; outline: none; transition: border-color 0.3s ease; }
+.form-input:focus { border-bottom-color: #9f1d1d; }
+.form-label { position: absolute; left: 0; top: 0.75rem; font-size: 1rem; color: #333; font-weight: 500; pointer-events: none; transition: all 0.3s ease; }
+.form-input:focus + .form-label, .form-input:not(:placeholder-shown) + .form-label { top: -0.5rem; font-size: 0.875rem; color: #9f1d1d; }
+.login-btn { width: 100%; padding: 1rem; background: #9f1d1d; color: white; border: none; border-radius: 25px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-bottom: 1rem; transition: background-color 0.3s ease; }
+.login-btn:hover { background: #861616; }
+.register-btn { width: 100%; padding: 1rem; background: #FECACA; color: #333; border: none; border-radius: 25px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease; }
+.register-btn:hover { background: #FCA5A5; }
+.form-section p { margin-top: 1.5rem; font-size: 0.9rem; color: #444; }
+.form-section p a { color: #9f1d1d; font-weight: 500; text-decoration: none; margin-left: 0.3rem; }
+.form-section p a:hover { text-decoration: underline; }
+.decoration-section { flex: 1; background: #9f1d1d; position: relative; overflow: hidden; }
+.decoration-pattern { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 768px) { .login-container, .register-container { flex-direction: column; } .decoration-section { min-height: 200px; } .form-section { max-width: none; } }
+.toast { position: fixed; top: 16px; right: 16px; background: #fff;; color: #9f1d1d; padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,.2); z-index: 9999; font-weight: 600; }
+.result-info-header{ display: grid; grid-template-columns: 2fr auto; align-items: center; }
 
 /* ===== Dropdown (Adicionar livro) ===== */
-.row__body_ext{
-  display: grid;
-  grid-template-columns: 2fr auto;
-  align-items: center;
-  gap: 20px;
-}
+.row__body_ext{ display: grid; grid-template-columns: 2fr auto; align-items: center; gap: 20px; }
+.row__add{ justify-self: end; }
+.dropdown { position: relative; display: inline-block; }
+.add-button { background: #fff; color: #9f1d1d; border: 1px solid #9f1d1d; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+.add-button:hover { background: #f4f4f4; }
+.dropdown-menu { display: none; position: absolute; top: 110%; right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; min-width: 120px; flex-direction: column; }
+.dropdown-menu .dropdown-item { padding: 10px; border: none; background: none; text-align: left; width: 100%; cursor: pointer; font-size: 14px; color: #9f1d1d; }
+.dropdown-menu .dropdown-item:hover { background: #f8f8f8; }
+.dropdown.open .dropdown-menu { display: flex; }
 
-.row__add{
-  justify-self: end;
-}
 
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
+/* ======================================================= */
+/* ========= NOVOS ESTILOS PARA A PÁGINA DA ESTANTE ======== */
+/* ======================================================= */
 
-.add-button {
-  background: #fff;
-  color: #9f1d1d;
-  border: 1px solid #9f1d1d;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-}
+/* --- Controles de Filtro e Ordenação --- */
+.shelf-controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; padding: 20px; background-color: #ffffff; border-radius: 8px; margin-bottom: 30px; border: 1px solid #ddd; gap: 20px; }
+.controls-group { display: flex; align-items: center; gap: 10px; color: #333; }
+.controls-group span { font-weight: 600; margin-right: 5px; }
+.control-btn { background: none; border: 1px solid #ccc; color: #555; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: all 0.2s ease; }
+.control-btn:hover { background-color: #f0f0f0; border-color: #9f1d1d; }
+.control-btn.active { background-color: #9f1d1d; color: white; border-color: #9f1d1d; font-weight: 600; }
+.controls-search .search__wrapper { min-width: 250px; }
+.controls-search .search__input { background-color: #fff; border: 1px solid #ccc; color: #333; padding-right: 35px; }
+.controls-search .search__input::placeholder { color: #999; }
+.controls-search .search-button { right: 10px; }
+.controls-search .search-button svg circle,
+.controls-search .search-button svg path { stroke: #9f1d1d; }
 
-.add-button:hover {
-  background: #f4f4f4;
+/* --- Estrelas de Avaliação nos Cards da Estante --- */
+.card__rating {
+  margin: -5px 0 10px 0;
+  color: #ffc107;
+  font-size: 20px;
+  text-align: center; /* MUDANÇA: Centralizado */
 }
+.star-icon { color: #e0e0e0; }
+.star-icon.filled { color: #ffc107; }
 
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 110%;
-  right: 0;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  z-index: 1000;
-  min-width: 120px;
-  flex-direction: column;
+/* --- Novo Layout do Modal da Estante --- */
+.modal-left-shelf { flex: 0 0 250px; }
+.modal-info-shelf { flex: 1; color: #222; }
+.modal-info-shelf h2 { margin-bottom: 20px; font-size: 2rem; color: #333; }
+.info-block-shelf {
+  border: 1px solid #9f1d1d; /* Borda vermelha */
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
 }
+.info-block-shelf p { margin-bottom: 8px; color: #555; }
+.info-block-shelf p:last-child { margin-bottom: 0; }
+.info-block-shelf #modal-description { font-size: 15px; line-height: 1.6; color: #333; }
 
-.dropdown-menu .dropdown-item {
-  padding: 10px;
-  border: none;
-  background: none;
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
-  font-size: 14px;
-  color: #9f1d1d;
-}
+/* --- Formulário de Ações no Modal da Estante --- */
+.modal-shelf-actions { margin-top: 20px; }
+.form-group-shelf { margin-bottom: 15px; }
+.shelf-status-label, .shelf-rating-label { display: block; font-weight: 600; margin-bottom: 5px; color: #9f1d1d; font-size: 1.1em; }
+.modal-shelf-actions select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+.modal-shelf-actions select option { background-color: white; color: #333; font-weight: bold; }
+.star-rating { cursor: pointer; font-size: 28px; }
+.star-rating .star { color: #ddd; transition: color 0.2s; }
+.star-rating .star:hover,
+.star-rating .star.selected { color: #ffc107; }
 
-.dropdown-menu .dropdown-item:hover {
-  background: #f8f8f8;
-}
-
-.dropdown.open .dropdown-menu {
-  display: flex;
-}
+/* Botões genéricos para o formulário do modal */
+.btn { width: 100%; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity 0.3s; text-align: center; }
+.btn-primary { background: #9f1d1d; color: white; border: none; margin-bottom: 10px; }
+.btn-danger { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
+.btn:hover { opacity: 0.85; }

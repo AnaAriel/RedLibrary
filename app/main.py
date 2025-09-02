@@ -131,13 +131,15 @@ def featured_from_google():
         resultado = google_search(f'intitle:"{termo}"', max_results=1)
         if resultado:
             featured.append(resultado[0])
-    return featured
+    return featured  # remove o código morto abaixo
 
+# ---------- Flash helpers (mensagens 1 vez) ----------
 def set_flash(request: Request, key: str, message: str):
     request.session[key] = message
 
 def pop_flash(request: Request, key: str):
     return request.session.pop(key, None)
+# -----------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
@@ -259,7 +261,12 @@ def add_to_shelf(
     book_authors: str = Form(...),
     book_description: str = Form(...),
     book_thumbnail: str = Form(...),
-    book_isbn: str = Form(None), # ISBN pode ser nulo
+    book_isbn: str = Form(None),
+    # --- NOVOS PARÂMETROS ---
+    book_publisher: str = Form(...),
+    book_pageCount: int = Form(...),
+    book_publishedDate: str = Form(...),
+    # --- FIM DOS NOVOS PARÂMETROS ---
     status: str = Form(...)
 ):
     user_id = request.session.get("user_id")
@@ -271,7 +278,10 @@ def add_to_shelf(
         "authors": book_authors.split(','),
         "description": book_description,
         "thumbnail": book_thumbnail,
-        "isbn": book_isbn
+        "isbn": book_isbn,
+        "publisher": book_publisher,
+        "pageCount": book_pageCount,
+        "publishedDate": book_publishedDate
     }
 
     book = crud.get_or_create_book(db, book_data)
